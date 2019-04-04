@@ -1,22 +1,22 @@
-# -*- coding:utf-8 -*-
-#Web App建立在asyncio的基础上，因此用aiohttp
-import logging; logging.basicConfig(level=logging.INFO)
-import asyncio,os,json,time
-from datetime import datetime
-
+import asyncio
 from aiohttp import web
 
-def index(request):
-    return web.Response(body=b'<h1>Awesome</h1>',content_type='text/html')
+#创建函数，用于管理URL，主要用于后面URL的绑定
+async def index(request):
+    #返回值用于构建响应
+    return web.Response(body='<h1>Welcome</h1>'.encode('utf-8'),content_type='text/html')
 
-@asyncio.coroutine
-def init(loop):
-    app = web.Application(loop=loop)
+#创建web服务器，用于处理URL和http协议
+async def init(loop):
+    app = web.Application()
     app.router.add_route('GET','/',index)
-    srv = yield from loop.create_server(app.make_handler(),'127.0.0.1',9000)
-    logging.info('server started at http://127.0.0.1:9000...')
+    #调用协程创建监听服务
+    srv = await loop.create_server(app._make_handler(),'127.0.0.1',8000)
+    print('http://127.0.0.1:8000')
     return srv
 
+#创建协程
 loop = asyncio.get_event_loop()
+#运行协程，直至函数结束
 loop.run_until_complete(init(loop))
 loop.run_forever()
